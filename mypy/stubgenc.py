@@ -19,6 +19,7 @@ from mypy.moduleinspect import is_c_module
 from mypy.stubdoc import (
     ArgSig,
     FunctionSig,
+    PropertySig,
     Sig,
     find_unique_signatures,
     infer_arg_sig_from_anon_docstring,
@@ -710,6 +711,9 @@ class InspectionStubGenerator(BaseStubGenerator):
         """
 
         docstring = getattr(raw_obj, "__doc__", None)
+        if docstring:
+            docstring = self._indent_docstring(docstring)
+
         fget = getattr(raw_obj, "fget", None)
         if fget:
             alt_docstr = getattr(fget, "__doc__", None)
@@ -740,23 +744,29 @@ class InspectionStubGenerator(BaseStubGenerator):
 
         if static:
             classvar = self.add_name("typing.ClassVar")
-            trailing_comment = "  # read-only" if readonly else ""
             if inferred_type is None:
                 inferred_type = self.add_name("_typeshed.Incomplete")
 
+            sig = PropertySig(name, inferred_type)
             static_properties.append(
-                f"{self._indent}{name}: {classvar}[{inferred_type}] = ...{trailing_comment}"
+                sig.format_sig(
+                    indent=self._indent,
+                    is_readonly=readonly,
+                    is_static=True,
+                    name_ref=classvar,
+                    docstring=docstring)
             )
         else:  # regular property
             if readonly:
                 ro_properties.append(f"{self._indent}@property")
                 sig = FunctionSig(name, [ArgSig("self")], inferred_type)
-                ro_properties.append(sig.format_sig(indent=self._indent))
+                ro_properties.append(sig.format_sig(indent=self._indent, docstring=docstring))
             else:
                 if inferred_type is None:
                     inferred_type = self.add_name("_typeshed.Incomplete")
 
-                rw_properties.append(f"{self._indent}{name}: {inferred_type}")
+                sig = PropertySig(name, inferred_type)
+                rw_properties.append(sig.format_sig(indent=self._indent, docstring=docstring))
 
     def get_type_fullname(self, typ: type) -> str:
         """Given a type, return a string representation"""

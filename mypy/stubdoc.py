@@ -150,6 +150,39 @@ class FunctionSig(NamedTuple):
         return f"{sig}{suffix}"
 
 
+class PropertySig(NamedTuple):
+    name: str
+    prop_type: str
+
+    def format_sig(
+        self,
+        indent: str = "",
+        is_readonly: bool | None = False,
+        is_static: bool | None = False,
+        name_ref: str | None = None,
+        docstring: str | None = None,
+    ) -> str:
+
+        if is_static:
+            if docstring:
+                prefix = f"{indent}{mypy.util.quote_docstring(docstring)}\n"
+            else:
+                prefix = ""
+
+            trailing_comment = "  # read-only" if is_readonly else ""
+            sig = f"{indent}{self.name}: {name_ref}[{self.prop_type}] = ...{trailing_comment}"
+
+            return f"{prefix}{sig}"
+        else:
+            sig = f"{indent}{self.name}: {self.prop_type}"
+            if docstring:
+                prefix = f"{indent}{mypy.util.quote_docstring(docstring)}\n"
+            else:
+                prefix = ""
+
+            return f"{prefix}{sig}"
+
+
 # States of the docstring parser.
 STATE_INIT: Final = 1
 STATE_FUNCTION_NAME: Final = 2
