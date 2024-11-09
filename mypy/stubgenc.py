@@ -20,6 +20,7 @@ from mypy.stubdoc import (
     ArgSig,
     FunctionSig,
     PropertySig,
+    ClassSig,
     Sig,
     find_unique_signatures,
     infer_arg_sig_from_anon_docstring,
@@ -869,34 +870,24 @@ class InspectionStubGenerator(BaseStubGenerator):
             classvar = self.add_name("typing.ClassVar")
             static_properties.append(f"{self._indent}{attr}: {classvar}[{prop_type_name}] = ...")
 
+        docstring = class_info.docstring
+        if docstring:
+            docstring = self._indent_docstring(docstring)
+
         self.dedent()
 
         bases = self.get_base_types(cls)
-        if bases:
-            bases_str = "(%s)" % ", ".join(bases)
-        else:
-            bases_str = ""
-        if types or static_properties or rw_properties or methods or ro_properties:
-            output.append(f"{self._indent}class {class_name}{bases_str}:")
-            for line in types:
-                if (
-                    output
-                    and output[-1]
-                    and not output[-1].strip().startswith("class")
-                    and line.strip().startswith("class")
-                ):
-                    output.append("")
-                output.append(line)
-            for line in static_properties:
-                output.append(line)
-            for line in rw_properties:
-                output.append(line)
-            for line in methods:
-                output.append(line)
-            for line in ro_properties:
-                output.append(line)
-        else:
-            output.append(f"{self._indent}class {class_name}{bases_str}: ...")
+        sig = ClassSig(class_name, bases)
+        output.append(
+            sig.format_sig(
+                indent=self._indent,
+                types=types,
+                methods=methods,
+                static_properties=static_properties,
+                rw_properties=rw_properties,
+                ro_properties=ro_properties,
+                docstring=docstring))
+
 
     def generate_variable_stub(self, name: str, obj: object, output: list[str]) -> None:
         """Generate stub for a single variable using runtime introspection.
