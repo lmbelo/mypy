@@ -711,7 +711,7 @@ class InspectionStubGenerator(BaseStubGenerator):
         obj : object after evaluation of descriptor
         """
 
-        docstring = getattr(raw_obj, "__doc__", None)
+        docstring = getattr(raw_obj, "__doc__", None) if self._include_docstrings else None
         if docstring:
             docstring = self._indent_docstring(docstring)
 
@@ -870,7 +870,7 @@ class InspectionStubGenerator(BaseStubGenerator):
             classvar = self.add_name("typing.ClassVar")
             static_properties.append(f"{self._indent}{attr}: {classvar}[{prop_type_name}] = ...")
 
-        docstring = class_info.docstring
+        docstring = class_info.docstring if self._include_docstrings else None
         if docstring:
             docstring = self._indent_docstring(docstring)
 
