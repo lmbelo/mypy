@@ -726,9 +726,6 @@ class InspectionStubGenerator(BaseStubGenerator):
             elif alt_docstr:
                 docstring = alt_docstr
 
-        if not self._include_docstrings:
-            docstring = None
-
         ctx = FunctionContext(
             self.module_name, name, docstring=docstring, is_abstract=False, class_info=class_info
         )
@@ -755,6 +752,9 @@ class InspectionStubGenerator(BaseStubGenerator):
         inferred_type = self.get_property_type(ret_type, self.sig_generators, ctx)
         if inferred_type is not None:
             inferred_type = self.strip_or_import(inferred_type)
+
+        if not self._include_docstrings:
+            docstring = None
 
         if static:
             classvar = self.add_name("typing.ClassVar")
