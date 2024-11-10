@@ -891,7 +891,7 @@ class InspectionStubGenerator(BaseStubGenerator):
 
         bases = self.get_base_types(cls)
         sig = ClassSig(class_name, bases)
-        output.append(
+        output.extend(
             sig.format_sig(
                 indent=self._indent,
                 types=types,

@@ -126,7 +126,7 @@ class ClassSig(NamedTuple):
             sig = f"{indent}class {self.name}{bases_str}: ..."
             output.append(f"{sig}{sufix}")
 
-        return "\n".join(output)
+        return output
 
 
 class FunctionSig(NamedTuple):
