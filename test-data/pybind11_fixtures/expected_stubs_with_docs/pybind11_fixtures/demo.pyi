@@ -38,6 +38,7 @@ class Point:
         @property
         def value(self) -> int:
             """(arg0: pybind11_fixtures.demo.Point.AngleUnit) -> int"""
+            
     class LengthUnit:
         """Members:
 
