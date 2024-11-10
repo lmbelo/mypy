@@ -652,8 +652,8 @@ class InspectionStubGenerator(BaseStubGenerator):
         self._fix_iter(ctx, inferred, output)
 
     def _indent_docstring(
-            self, docstring: str, extra_indent: bool = True, trailing_newline: bool = False
-        ) -> str:
+        self, docstring: str, extra_indent: bool = True, trailing_newline: bool = False
+    ) -> str:
         """Fix indentation of docstring extracted from pybind11 or other binding generators."""
         lines = docstring.splitlines(keepends=True)
         indent = self._indent + ("    " if extra_indent else "")
@@ -769,7 +769,7 @@ class InspectionStubGenerator(BaseStubGenerator):
                     is_readonly=readonly,
                     is_static=True,
                     name_ref=classvar,
-                    docstring=docstring
+                    docstring=docstring,
                 )
             )
         else:  # regular property
@@ -903,7 +903,7 @@ class InspectionStubGenerator(BaseStubGenerator):
                 static_properties=static_properties,
                 rw_properties=rw_properties,
                 ro_properties=ro_properties,
-                docstring=docstring
+                docstring=docstring,
             )
         )
 
