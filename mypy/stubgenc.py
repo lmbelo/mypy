@@ -717,7 +717,7 @@ class InspectionStubGenerator(BaseStubGenerator):
         obj : object after evaluation of descriptor
         """
 
-        docstring = getattr(raw_obj, "__doc__", None) if self._include_docstrings else None
+        docstring = getattr(raw_obj, "__doc__", None)
         fget = getattr(raw_obj, "fget", None)
         if fget:
             alt_docstr = getattr(fget, "__doc__", None)
@@ -725,6 +725,9 @@ class InspectionStubGenerator(BaseStubGenerator):
                 docstring += "\n" + alt_docstr
             elif alt_docstr:
                 docstring = alt_docstr
+
+        if not self._include_docstrings:
+            docstring = None
 
         ctx = FunctionContext(
             self.module_name, name, docstring=docstring, is_abstract=False, class_info=class_info
