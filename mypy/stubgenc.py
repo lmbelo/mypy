@@ -761,9 +761,9 @@ class InspectionStubGenerator(BaseStubGenerator):
             if inferred_type is None:
                 inferred_type = self.add_name("_typeshed.Incomplete")
 
-            sig = PropertySig(name, inferred_type)
+            prop_sig = PropertySig(name, inferred_type)
             static_properties.append(
-                sig.format_sig(
+                prop_sig.format_sig(
                     indent=self._indent,
                     is_readonly=readonly,
                     is_static=True,
@@ -773,14 +773,14 @@ class InspectionStubGenerator(BaseStubGenerator):
         else:  # regular property
             if readonly:
                 ro_properties.append(f"{self._indent}@property")
-                sig = FunctionSig(name, [ArgSig("self")], inferred_type)
-                ro_properties.append(sig.format_sig(indent=self._indent, docstring=docstring))
+                func_sig = FunctionSig(name, [ArgSig("self")], inferred_type)
+                ro_properties.append(func_sig.format_sig(indent=self._indent, docstring=docstring))
             else:
                 if inferred_type is None:
                     inferred_type = self.add_name("_typeshed.Incomplete")
 
-                sig = PropertySig(name, inferred_type)
-                rw_properties.append(sig.format_sig(indent=self._indent, docstring=docstring))
+                prop_sig = PropertySig(name, inferred_type)
+                rw_properties.append(prop_sig.format_sig(indent=self._indent, docstring=docstring))
 
     def get_type_fullname(self, typ: type) -> str:
         """Given a type, return a string representation"""

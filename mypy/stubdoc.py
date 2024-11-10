@@ -85,7 +85,7 @@ class ClassSig(NamedTuple):
         rw_properties: list[str],
         ro_properties: list[str],
         docstring: str | None = None,
-    ) -> str:
+    ) -> list[str]:
 
         output: list[str] = []
 
