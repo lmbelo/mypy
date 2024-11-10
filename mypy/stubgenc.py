@@ -651,16 +651,22 @@ class InspectionStubGenerator(BaseStubGenerator):
         output.extend(self.format_func_def(inferred, decorators=decorators, docstring=docstring))
         self._fix_iter(ctx, inferred, output)
 
-    def _indent_docstring(self, docstring: str) -> str:
+    def _indent_docstring(
+            self, docstring: str, extra_indent: bool = True, trailing_newline: bool = False) -> str:
         """Fix indentation of docstring extracted from pybind11 or other binding generators."""
         lines = docstring.splitlines(keepends=True)
-        indent = self._indent + "    "
+        indent = self._indent + ("    " if extra_indent else "")
         if len(lines) > 1:
             if not all(line.startswith(indent) or not line.strip() for line in lines):
                 # if the docstring is not indented, then indent all but the first line
                 for i, line in enumerate(lines[1:]):
                     if line.strip():
-                        lines[i + 1] = indent + line
+                        # ignore any left space to keep the standard ident
+                        lines[i + 1] = indent + line.lstrip()
+
+        if trailing_newline and not lines[-1].endswith("\n"):
+            lines[-1] += '\n'
+
         # if there's a trailing newline, add a final line to visually indent the quoted docstring
         if lines[-1].endswith("\n"):
             if len(lines) > 1:
@@ -712,9 +718,6 @@ class InspectionStubGenerator(BaseStubGenerator):
         """
 
         docstring = getattr(raw_obj, "__doc__", None) if self._include_docstrings else None
-        if docstring:
-            docstring = self._indent_docstring(docstring)
-
         fget = getattr(raw_obj, "fget", None)
         if fget:
             alt_docstr = getattr(fget, "__doc__", None)
@@ -733,6 +736,13 @@ class InspectionStubGenerator(BaseStubGenerator):
         self.record_name(ctx.name)
         static = self.is_static_property(raw_obj)
         readonly = self.is_property_readonly(raw_obj)
+
+        if docstring:
+            # fields must define its docstring using the same ident
+            # readonly properties generates a function,
+            # which requires an extra ident in the first line
+            docstring = self._indent_docstring(docstring, extra_indent=readonly)
+
         if static:
             ret_type: str | None = self.strip_or_import(self.get_type_annotation(obj))
         else:
@@ -872,7 +882,7 @@ class InspectionStubGenerator(BaseStubGenerator):
 
         docstring = class_info.docstring if self._include_docstrings else None
         if docstring:
-            docstring = self._indent_docstring(docstring)
+            docstring = self._indent_docstring(docstring, extra_indent=False, trailing_newline=True)
 
         self.dedent()
 
