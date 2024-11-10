@@ -907,7 +907,6 @@ class InspectionStubGenerator(BaseStubGenerator):
             )
         )
 
-
     def generate_variable_stub(self, name: str, obj: object, output: list[str]) -> None:
         """Generate stub for a single variable using runtime introspection.
 
