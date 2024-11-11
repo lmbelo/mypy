@@ -401,8 +401,9 @@ class InspectionStubGenerator(BaseStubGenerator):
 
     def is_defined_in_module(self, obj: object) -> bool:
         """Check if object is considered defined in the current module."""
-        module = self.get_obj_module(obj)
-        return module is None or module == self.module_name
+        #module = self.get_obj_module(obj)
+        #return (module is None or module == self.module_name)
+        return True
 
     def generate_module(self) -> None:
         all_items = self.get_members(self.module)
